@@ -1,0 +1,45 @@
+name: Deploy ZIP to Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt -t package
+
+      - name: Copy app files
+        run: |
+          cp -r app package/
+
+      - name: Create ZIP file
+        run: |
+          cd package
+          zip -r ../function.zip .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name fastapi-zip-lambda \
+            --zip-file fileb://function.zip
