@@ -11,9 +11,9 @@ client = TestClient(app)
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Hello from FastAPI CI/CD Project - Test Run"}
+    assert response.json() == {"message": "Hello from FastAPI CI/CD Project"}
 
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "healthy - Test Run"}
+    assert response.json() == {"status": "healthy"}
